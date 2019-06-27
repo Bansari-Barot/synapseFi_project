@@ -19,7 +19,7 @@ client = Client(
 users=[]
 
 class User(Resource):
-    def post(self):
+    def post(self,user_id=None):
 
         body=request.get_json()
         new_user= client.create_user(body,"127.0.0.1:5000")
@@ -28,10 +28,45 @@ class User(Resource):
         users.append(result)
         return str(result),201
 
-    # def get(self,user_id):
-    #     user=client.get_user(user_id, full_dehydrate=True)
-    #     result=user.__dict__
-    #     return str(result),200
+    def get(self,user_id):
+        user=client.get_user(user_id, full_dehydrate=True)
 
-# api.add_resource(User, '/user')
-api.add_resource(User, '/user')
+        #database query to get refresh_token for user with user_id
+        body={
+            "refresh_token":"refresh_ehG7YBS8ZiD0sLa6PQHMUxryovVkJzElC5gWROXq",
+            "scope":[
+                "NODES|POST",
+                "NODES|GET",
+                "NODE|GET",
+                "TRANS|POST"
+                ]
+        }
+        oauth_user=user.oauth(body)
+        # result=oauth_user.__dict__
+        return oauth_user,200
+
+    def patch(self,user_id):
+        user=client.get_user(user_id, full_dehydrate=True)
+        body=request.get_json()
+        result=user.update_info(body)
+        return str(result)
+
+
+class KYCDocument(Resource):
+    def post(self,user_id):
+        body=request.get_json()
+        user=client.get_user(user_id, full_dehydrate=True)
+        result=user.update_info(body)
+        return str(result), 201
+
+    def delete(self,user_id):
+        body=request.get_json()
+        user=client.get_user(user_id, full_dehydrate=True)
+        result=user.user_update(body)
+        return str(result), 202
+
+
+
+
+api.add_resource(User, '/user/<string:user_id>')
+api.add_resource(KYCDocument, '/kyc/<string:user_id>')
