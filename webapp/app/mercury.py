@@ -19,7 +19,7 @@ client = Client(
 users=[]
 
 class User(Resource):
-    def post(self,user_id):
+    def post(self):
 
         body=request.get_json()
         new_user= client.create_user(body,"127.0.0.1:5000")
