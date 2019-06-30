@@ -7,6 +7,7 @@ class User(EmbeddedMongoModel):
     user_emails=fields.ListField()
     phone_numbers=fields.ListField()
     legal_names=fields.ListField()
+    node_id=fields.CharField()
 
-# class Mercury(MongoModel):
-#     users=fields.EmbeddedDocumentListField(User)
+class Mercury(MongoModel):
+    users=fields.EmbeddedDocumentListField(User)
