@@ -164,6 +164,18 @@ class DebitCard(Resource):
         result=user.update_subnet(node_id, subnet_id, body)
         return str(result)
 
+class Statements(Resource):
+    def get(self):
+        user=client.get_user(user_id, full_dehydrate=True)
+        result=user.get_statements()
+        return result, 200
+
+class Check(Resource):
+    def post(self,user_id):
+        body=request.get_json()
+        user=client.get_user(user_id, full_dehydrate=True)
+        result=user.create_node(body)
+        return result, 201
 
 
 api.add_resource(User, '/user/<string:user_id>')
@@ -173,3 +185,4 @@ api.add_resource(DepositAccount, '/deposit_acc/<string:user_id>')
 api.add_resource(IssueRouting, '/issue_routing/<string:user_id>/<string:node_id>/<string:subnet_id>')
 api.add_resource(FundWithdraw, '/fund_withdraw/<string:user_id>/<string:node_id>')
 api.add_resource(DebitCard, '/debitcard/<string:user_id>/<string:node_id>/<string:subnet_id>')
+api.add_resource(Statements,'/statements/')
