@@ -4,7 +4,7 @@
 * Git clone the repository
 * Get client id and secret key from synapseFi and add it to webapp/config.py file
 * Install Docker and docker-compose (https://docs.docker.com/compose/install/)
-* Go to synapseFi_project folder and check that there is docker-compose.yml file
+* Go to synapseFi_project folder in terminal, where you can see docker-compose.yml file
 * Run following commands:
     - docker-compose build
     - docker-compose up
