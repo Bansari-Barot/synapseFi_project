@@ -5,9 +5,9 @@ import json
 from config import Config
 from app import api
 from flask_restful import Resource, Api
-
+from pymodm import connect
 from app import app
-from app.models import User
+from app.models import UserInfo, Mercury
 
 client = Client(
     client_id='client_id_2bb1e412edd311e6bd04e285d6015267',
@@ -21,19 +21,25 @@ users=[]
 class User(Resource):
     def post(self,user_id=None):
         body=request.get_json()
-
+        connect(app.config['MONGO_URI'])
         #if email id present in mongodb then don't create new user
-
+        new_user = client.create_user(body,"127.0.0.1")
         result=new_user.__dict__
-        #user=User(user_id=result['id'], user_refresh_token=result['body']['refresh_token'], user_emails=["test@synapsefi.com"], phone_numbers=["test@synapsefi.com", "901.111.1111"],legal_names=["Test User"]).save()
-        users.append(result)
-        return str(result),201
+
+        response=result['body']
+
+        user=UserInfo(user_id=response['_id'], user_refresh_token=response['refresh_token'], logins=response['logins'], phone_numbers=response['phone_numbers'])
+        mercury=Mercury(users=[user]).save()
+        return response,201
 
     def get(self,user_id):
         user=client.get_user(user_id, full_dehydrate=True)
-        #database query to get refresh_token for user with user_id
+        connect(app.config['MONGO_URI'])
+        all_users=Mercury.objects.select_related('users').get({"users.user_id":user_id}).users
+        refresh_token=[x.user_refresh_token for x in all_users if x.user_id==user_id]
+        #oauth of user
         body={
-            "refresh_token":"refresh_ehG7YBS8ZiD0sLa6PQHMUxryovVkJzElC5gWROXq",
+            "refresh_token":refresh_token[0],
             "scope":[
                 "NODES|POST",
                 "NODES|GET",
@@ -169,13 +175,7 @@ class Statements(Resource):
         user=client.get_user(user_id, full_dehydrate=True)
         result=user.get_statements()
         return result, 200
-
-class Check(Resource):
-    def post(self,user_id):
-        body=request.get_json()
-        user=client.get_user(user_id, full_dehydrate=True)
-        result=user.create_node(body)
-        return result, 201
+ 
 
 
 api.add_resource(User, '/user/<string:user_id>')
