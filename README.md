@@ -1,5 +1,11 @@
 # synapseFi_Task | mercury.co
 
+### Stack used
+* Flask (RESTful)
+* MongoDB
+* Docker
+* python
+
 ## Installation
 * Git clone the repository
 * Get client id and secret key from synapseFi and add it to webapp/config.py file
